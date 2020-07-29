@@ -2,6 +2,7 @@
 
 import os
 
+import numpy as np
 import pandas as pd
 
 root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -23,4 +24,19 @@ def get_adults_df():
 
     return pd.concat([train, test], ignore_index=True)
 
-get_adults_df()
+def convert_label_to_binary(df, label_name, favorable_classes):
+    """레이블을 특정 이진값 또는 0,1 이진값으로 변환"""
+    favorable_label = 1.
+    unfavorable_label = 0.
+    if callable(favorable_classes):
+        # favorable_classes가 True, False를 리턴하는 함수일때
+        df[label_name] = df[label_name].apply(favorable_classes)
+    elif np.issubdtype(df[label_name], np.number) and len(set(df[label_name])) == 2:
+        # labels are already binary; don't change them
+        favorable_label = favorable_classes[0]
+        unfavorable_label = set(df[label_name]).difference(favorable_classes).pop()
+    else:
+        # find all instances which match any of the favorable classes
+        pos = np.logical_or.reduce(np.equal.outer(favorable_classes, df[label_name]))
+        df.loc[pos, label_name] = favorable_label
+        df.loc[~pos, label_name] = unfavorable_label

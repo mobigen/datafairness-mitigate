@@ -22,23 +22,23 @@ Classification Model의 Classification과 Classification 결과의 공정성 확
 
 논문 [Mitigating Unwanted Biases with Adversarial Learning](https://arxiv.org/pdf/1801.07593.pdf) 참조
 
-데이터의 Feature들을 Input으로 받아 Real Label을 예측하는 _Classifier_ 파트와, _Classifier_의 Label Prediction 결과와 Real Label을 Input으로 받아 Protected Attribute 값을 예측하는 _Adversary_ 파트로 구성
+데이터의 Feature들을 Input으로 받아 Real Label을 예측하는 _Classifier_ 파트와, _Classifier_ 의 Label Prediction 결과와 Real Label을 Input으로 받아 Protected Attribute 값을 예측하는 _Adversary_ 파트로 구성
 
 #### Adversarial Train
 
-_Classifier_와 _Adversary_를 연결하여 학습
+_Classifier_ 와 _Adversary_ 를 연결하여 학습
 
 ![the_architecture_of_the_adversarial_network](https://user-images.githubusercontent.com/22609242/88897482-4dbe7700-d286-11ea-97f5-67614ecf271d.png)
 
-_Classifier_는 학습을 통해 Protected Attribute를 포함하는 Feature들로부터 Real Label에 가까운 Label(확률)을 계산하도록 최적화되며, _Adversary_는 Real Label에 따라 _Classifier_가 예측한 확률값에 발생하는 편향을 살피고 Protected Attribute와의 상관성을 고려해서 Real Protected Attribute를 도출하도록 최적화된다.
+_Classifier_ 는 학습을 통해 Protected Attribute를 포함하는 Feature들로부터 Real Label에 가까운 Label(확률)을 계산하도록 최적화되며, _Adversary_ 는 Real Label에 따라 _Classifier_ 가 예측한 확률값에 발생하는 편향을 살피고 Protected Attribute와의 상관성을 고려해서 Real Protected Attribute를 도출하도록 최적화된다.
 
-모델 학습 중 발생하는 총 Loss에서 _Classifier_의 Prediction Failure가 Loss 증가 요인이며, _Adversary_의 Prediction Success가 Loss 증가 요인이다. 이렇게 서로 Loss 방향이 반대되는 적대적 학습을 수행하도록 한다.
+모델 학습 중 발생하는 총 Loss에서 _Classifier_ 의 Prediction Failure가 Loss 증가 요인이며, _Adversary_ 의 Prediction Success가 Loss 증가 요인이다. 이렇게 서로 Loss 방향이 반대되는 적대적 학습을 수행하도록 한다.
 
 ![equality_of_odds](https://user-images.githubusercontent.com/22609242/88901962-7d707d80-d28c-11ea-8ad3-6a485d32fb40.png)
 
-이런 적대적 학습에 의해 _Classifier_는, _Adversary_의 Loss를 감소 시켜야 하므로, Classification 예측 결과에 영향을 주는 Feature 중 Protected Attribute 값의 상관을 최소화 하도록 최적화된다.
+이런 적대적 학습에 의해 _Classifier_ 는, _Adversary_ 의 Loss를 감소 시켜야 하므로, Classification 예측 결과에 영향을 주는 Feature 중 Protected Attribute 값의 상관을 최소화 하도록 최적화된다.
 
-또 자신의 Loss를 감소 시켜야 하므로, 최종적으로 _Classifier_는 최대한 높은 Prediction 정확도를 가지면서 Protected Attribute의 영향로부터 공정성을 가지는 결과를 출력하는 모델이 된다.
+또 자신의 Loss를 감소 시켜야 하므로, 최종적으로 _Classifier_ 는 최대한 높은 Prediction 정확도를 가지면서 Protected Attribute의 영향로부터 공정성을 가지는 결과를 출력하는 모델이 된다.
 
 ### Fair Representation
 

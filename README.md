@@ -18,7 +18,7 @@
 
 ### Adversarial Debiasing
 
-Classification Model의 학습과 Classification 결과의 공정성 확보를 동시에 수행하는 Deep Learning Classification Model이자 Bias Mitigation Model.
+Classification Model의 Classification과 Classification 결과의 공정성 확보를 동시에 수행하는 Deep Learning Classification Model이자 Bias Mitigation Model.
 
 논문 [Mitigating Unwanted Biases with Adversarial Learning](https://arxiv.org/pdf/1801.07593.pdf) 참조
 
@@ -34,9 +34,9 @@ Classifier는 학습을 통해 Protected Attribute를 포함하는 Feature들로
 
 모델 학습 중 발생하는 총 Loss에서 Classifier의 Prediction Failure가 Loss 증가 요인이며, Adversary의 Prediction Success가 Loss 증가 요인이다. 이렇게 서로 Loss 방향이 반대되는 적대적 학습을 수행하도록 한다.
 
-이런 적대적 학습에 의해 Classifier의 경우, Adversary의 Loss를 감소 시켜야 하므로, Classification 예측 결과에 영향을 주는 Feature 중 Protected Attribute 값의 상관을 최소화 하도록 최적화된다.
+![equality_of_odds](https://user-images.githubusercontent.com/22609242/88901962-7d707d80-d28c-11ea-8ad3-6a485d32fb40.png)
 
-![equality_of_odds](https://user-images.githubusercontent.com/22609242/88900394-47ca9500-d28a-11ea-80e0-96765a713038.png)
+이런 적대적 학습에 의해 Classifier의 경우, Adversary의 Loss를 감소 시켜야 하므로, Classification 예측 결과에 영향을 주는 Feature 중 Protected Attribute 값의 상관을 최소화 하도록 최적화된다.
 
 ### Fair Representation
 

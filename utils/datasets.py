@@ -24,6 +24,23 @@ def get_adults_df():
 
     return pd.concat([train, test], ignore_index=True)
 
+def handle_missing(df, handle_funcs=None):
+    "결측치 처리"
+    if handle_funcs: raise NotImplementedError
+    else:
+        dropped_df = df.dropna()
+        drop_cnt = df.shape[0] - dropped_df.shape[0]
+        print(f"Missing Data: {drop_cnt} rows removed.")
+        df = dropped_df
+    return df
+
+def convert_one_hot_features(df, column_names=None):
+    "Categorical Column을 One-Hot으로 변환"
+    if column_names:
+        print('here')
+        df = pd.get_dummies(df, prefix_sep='=', columns=column_names)
+    return df
+
 def convert_label_to_binary(df, label_name, favorable_label_classes):
     """레이블을 특정 이진값 또는 0,1 이진값으로 변환"""
     favorable_converted_label = 1.
@@ -40,7 +57,12 @@ def convert_label_to_binary(df, label_name, favorable_label_classes):
         pos = np.logical_or.reduce(np.equal.outer(favorable_label_classes, df[label_name].to_numpy()))
         df.loc[pos, label_name] = favorable_converted_label
         df.loc[~pos, label_name] = unfavorable_converted_label
+    return df
 
 def preprocess_df(df, label_name, favorable_label_classes, custom_preproc=None):
     if custom_preproc: df = custom_preproc(df)
-    convert_label_to_binary(df, label_name, favorable_label_classes)
+    df = handle_missing(df)
+    df = convert_one_hot_features(df, column_names=['workclass', 'education', 'marital-status',
+                                                   'occupation', 'relationship', 'native-country'])
+    df = convert_label_to_binary(df, label_name, favorable_label_classes)
+    return df

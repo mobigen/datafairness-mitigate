@@ -108,9 +108,8 @@ class AdversarialDebiasing:
         if self.seed is not None:
             np.random.seed(self.seed)
 
-        protected_attribute_inds = [df.columns.get_loc(prot_attr_name) for prot_attr_name in protected_attribute_names]
         label_ind = df.columns.get_loc(label_name)
-        feature_names = np.delete(df.columns.values, [label_ind] + protected_attribute_inds)
+        feature_names = np.delete(df.columns.values, label_ind)
 
         features = df.loc[:,feature_names].values
         protected_attributes = df[protected_attribute_names].values[:, protected_attribute_names.index(self.protected_attribute_name)]

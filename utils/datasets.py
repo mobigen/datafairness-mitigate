@@ -37,14 +37,13 @@ def handle_missing(df, handle_funcs=None):
 def convert_one_hot_features(df, column_names=None):
     "Categorical Column을 One-Hot으로 변환"
     if column_names:
-        print('here')
         df = pd.get_dummies(df, prefix_sep='=', columns=column_names)
     return df
 
 def convert_label_to_binary(df, label_name, favorable_label_classes):
     """레이블을 특정 이진값 또는 0,1 이진값으로 변환"""
-    favorable_converted_label = 1.
-    unfavorable_converted_label = 0.
+    favorable_converted_label = 1.  # favorable label class는 1
+    unfavorable_converted_label = 0.  # unfavorable label class는 0
     if callable(favorable_label_classes):
         # favorable_label_classes True, False를 리턴하는 함수일때
         df[label_name] = df[label_name].apply(favorable_label_classes)

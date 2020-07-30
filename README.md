@@ -16,11 +16,35 @@
 
 ## 방법 및 이론
 
-### Adversarial Debasing
+### Adversarial Debiasing
+
+Classification Model의 학습과 Classification 결과의 공정성 확보를 동시에 수행하는 Deep Learning Classification Model이자 Bias Mitigation Model.
+
+논문 [Mitigating Unwanted Biases with Adversarial Learning](https://arxiv.org/pdf/1801.07593.pdf) 참조
+
+데이터의 Feature들을 Input으로 받아 Real Label을 예측하는 _Classifier_ 파트와, Classifier의 Label Prediction 결과와 Real Label을 Input으로 받아 Protected Attribute 값을 예측하는 _Adversary_ 파트로 구성
+
+#### Adversarial Train
+
+Classifier와 Adversary를 연결하여 학습
+
+![the_architecture_of_the_adversarial_network](https://user-images.githubusercontent.com/22609242/88897482-4dbe7700-d286-11ea-97f5-67614ecf271d.png)
+
+Classifier는 학습을 통해 Protected Attribute를 포함하는 Feature들로부터 Real Label에 가까운 Label(확률)을 계산하도록 최적화되며, Adversary는 Real Label에 따라 Classifier가 예측한 확률값에 발생하는 편향을 살피고 Protected Attribute와의 상관성을 고려해서 Real Protected Attribute를 도출하도록 최적화된다.
+
+모델 학습 중 발생하는 총 Loss에서 Classifier의 Prediction Failure가 Loss 증가 요인이며, Adversary의 Prediction Success가 Loss 증가 요인이다. 이렇게 서로 Loss 방향이 반대되는 적대적 학습을 수행하도록 한다.
+
+이런 적대적 학습에 의해 Classifier의 경우, Adversary의 Loss를 감소 시켜야 하므로, Classification 예측 결과에 영향을 주는 Feature 중 Protected Attribute 값의 상관을 최소화 하도록 최적화된다.
+
+![equality_of_odds](https://user-images.githubusercontent.com/22609242/88900394-47ca9500-d28a-11ea-80e0-96765a713038.png)
 
 ### Fair Representation
 
 ## 실험
+
+### 데이터
+
+### Adversarial Debiasing
 
 ---
 

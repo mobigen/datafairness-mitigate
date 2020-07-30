@@ -24,19 +24,23 @@ def get_adults_df():
 
     return pd.concat([train, test], ignore_index=True)
 
-def convert_label_to_binary(df, label_name, favorable_classes):
+def convert_label_to_binary(df, label_name, favorable_label_classes):
     """레이블을 특정 이진값 또는 0,1 이진값으로 변환"""
-    favorable_label = 1.
-    unfavorable_label = 0.
-    if callable(favorable_classes):
-        # favorable_classes가 True, False를 리턴하는 함수일때
-        df[label_name] = df[label_name].apply(favorable_classes)
+    favorable_converted_label = 1.
+    unfavorable_converted_label = 0.
+    if callable(favorable_label_classes):
+        # favorable_label_classes True, False를 리턴하는 함수일때
+        df[label_name] = df[label_name].apply(favorable_label_classes)
     elif np.issubdtype(df[label_name], np.number) and len(set(df[label_name])) == 2:
         # labels are already binary; don't change them
-        favorable_label = favorable_classes[0]
-        unfavorable_label = set(df[label_name]).difference(favorable_classes).pop()
+        favorable_converted_label = favorable_label_classes[0]
+        unfavorable_converted_label = set(df[label_name]).difference(favorable_label_classes).pop()
     else:
         # find all instances which match any of the favorable classes
-        pos = np.logical_or.reduce(np.equal.outer(favorable_classes, df[label_name]))
-        df.loc[pos, label_name] = favorable_label
-        df.loc[~pos, label_name] = unfavorable_label
+        pos = np.logical_or.reduce(np.equal.outer(favorable_label_classes, df[label_name].to_numpy()))
+        df.loc[pos, label_name] = favorable_converted_label
+        df.loc[~pos, label_name] = unfavorable_converted_label
+
+def preprocess_df(df, label_name, favorable_label_classes, custom_preproc=None):
+    if custom_preproc: df = custom_preproc(df)
+    convert_label_to_binary(df, label_name, favorable_label_classes)

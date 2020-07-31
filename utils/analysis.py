@@ -4,45 +4,65 @@ import numpy as np
 import pandas as pd
 
 class ClassificationMetric:
-    def __init__(self, origin_df, prediction_df, label_name):
+    def __init__(self, origin_df, prediction_df, protected_attribute_name, label_name):
         self.orig_df = origin_df
         self.pred_df = prediction_df
+
+        self.prot_name = protected_attribute_name
         self.label_name = label_name
 
-        self.origin_pos_mask = (self.orig_df[label_name] == True)
-        self.pred_pos_mask = (self.pred_df[label_name] == True)
+        self.origin_pos_mask = None
 
-    def num_positive(self):
-        return np.sum(self.origin_pos_mask)
+    def make_mask(self, privileged=None):
+        """특정 조건에 따라 Metric에 사용할 Mask를 생성
+        Arguments:
+        - privileged: (None/True/False)
+            - None: 전체 Group에 대하여 계산
+            - True: Protected attribute 값이 1인 Group에 대하여 계산
+            - False: Pretected attribute 값이 0인 Group에 대하여 계산"""
+        if self.origin_pos_mask is None:
+            self.origin_pos_mask = (self.orig_df[self.label_name] == True)
+
+        mask = self.origin_pos_mask
+        if privileged is not None:
+            if privileged:
+                pass
+            else:
+                pass
+        return mask
+
+    def num_positive(self, privileged=None):
+        """Positive 개체수를 카운트하여 반환."""
+        return np.sum(self.make_mask())
 
     def num_negative(self):
-        return np.sum(~self.origin_pos_mask)
+        return np.sum(~self.make_mask())
 
     def num_pred_positive(self):
-        return np.sum(self.pred_pos_mask)
+        return self.num_true_positive() + self.num_false_positive()
 
     def num_pred_negative(self):
-        return np.sum(~self.pred_pos_mask)
+        return self.num_true_negative() + self.num_false_negative()
 
     def num_true_positive(self):
         return np.sum(
-            (self.orig_df[self.label_name][self.origin_pos_mask] ==
-             self.pred_df[self.label_name][self.origin_pos_mask]))
+            (self.orig_df[self.label_name][self.make_mask()] ==
+             self.pred_df[self.label_name][self.make_mask()]))
 
     def num_true_negative(self):
         return np.sum(
-            (self.orig_df[self.label_name][~self.origin_pos_mask] ==
-             self.pred_df[self.label_name][~self.origin_pos_mask]))
+            (self.orig_df[self.label_name][~self.make_mask()] ==
+             self.pred_df[self.label_name][~self.make_mask()]))
 
     def num_false_positive(self):
         return np.sum(
-            (self.orig_df[self.label_name][~self.origin_pos_mask] !=
-             self.pred_df[self.label_name][~self.origin_pos_mask]))
+            (self.orig_df[self.label_name][~self.make_mask()] !=
+             self.pred_df[self.label_name][~self.make_mask()]))
 
     def num_false_negative(self):
         return np.sum(
-            (self.orig_df[self.label_name][self.origin_pos_mask] !=
-             self.pred_df[self.label_name][self.origin_pos_mask]))
+            (self.orig_df[self.label_name][self.make_mask()] !=
+             self.pred_df[self.label_name][self.make_mask()]))
 
     def perform_confusion_matrix(self):
         P = self.num_positive()

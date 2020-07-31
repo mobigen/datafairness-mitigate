@@ -91,15 +91,14 @@ def describe_df(df):
     print('Shape:', df.shape)
 
 def split_df(df, shuffle=True, ratio=0.7):
-    ind = df.index.values
-    nrow = ind.shape[0]
+    nrow = df.index.values.shape[0]
     train_nrow = int(nrow * ratio)
-    mask = np.zeros(nrow, dtype=np.bool)
 
+    mask = np.zeros(nrow, dtype=np.bool)
     if not shuffle:
-        train_ind = ind[:train_nrow]
+        mask[:train_nrow] = True
     else:
         train_ind = np.random.choice(nrow, size=train_nrow, replace=False)
+        mask[train_ind] = True
 
-    mask[train_ind] = True
     return df[mask], df[~mask]

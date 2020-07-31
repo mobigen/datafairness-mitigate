@@ -1,6 +1,7 @@
 # coding: utf-8
 
 import numpy as np
+import pandas as pd
 
 try:
     import tensorflow as tf
@@ -105,6 +106,9 @@ class AdversarialDebiasing:
         Returns:
         - AdversarialDebiasing: Returns self.
         """
+        if not isinstance(df, pd.DataFrame):
+            raise TypeError('Argument Type of \'df\' must be pandas.DataFrame, not %s'%str(type(df)))
+
         if self.seed is not None:
             np.random.seed(self.seed)
 
@@ -196,3 +200,52 @@ class AdversarialDebiasing:
                             print("epoch %d; iter: %d; batch classifier loss: %f" % (
                             epoch, i, pred_labels_loss_value))
         return self
+
+    def predict(self, df, label_name):
+        """Obtain the predictions for the provided dataset using the fair
+        classifier learned.
+
+        Args:
+            dataset (BinaryLabelDataset): Dataset containing labels that needs
+                to be transformed.
+        Returns:
+            dataset (BinaryLabelDataset): Transformed dataset.
+        """
+        if not isinstance(df, pd.DataFrame):
+            raise TypeError('Argument Type of \'df\' must be pandas.DataFrame, not %s'%str(type(df)))
+
+        if self.seed is not None:
+            np.random.seed(self.seed)
+
+        num_test_samples, _ = df.shape
+
+        label_ind = df.columns.get_loc(label_name)
+        feature_names = np.delete(df.columns.values, label_ind)
+
+        features = df.loc[:,feature_names].values
+        labels = df[label_name].values
+
+        samples_covered = 0
+        pred_labels = []
+        while samples_covered < num_test_samples:
+            start = samples_covered
+            end = samples_covered + self.batch_size
+            if end > num_test_samples:
+                end = num_test_samples
+            batch_ids = np.arange(start, end)
+            batch_features = features[batch_ids]
+            batch_labels = np.reshape(labels[batch_ids], [-1,1])
+
+            batch_feed_dict = {self.features_ph: batch_features,
+                               self.true_labels_ph: batch_labels,
+                               self.keep_prob: 1.0}
+
+            pred_labels += self.sess.run(self.pred_labels, feed_dict=batch_feed_dict)[:,0].tolist()
+            samples_covered += len(batch_features)
+
+        # Mutated, fairer dataset with new labels
+        df_new = df.copy(deep=True)
+        labels_new = (np.array(pred_labels)>0.5).astype(np.float64).reshape(-1,1)
+        df_new[label_name] = labels_new
+
+        return df_new

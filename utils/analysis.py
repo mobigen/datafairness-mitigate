@@ -35,88 +35,88 @@ class ClassificationMetric:
         """Positive 개체수를 카운트하여 반환."""
         return np.sum(self.make_mask(privileged=privileged))
 
-    def num_negative(self):
-        return np.sum(~self.make_mask())
+    def num_negative(self, privileged=None):
+        return np.sum(~self.make_mask(privileged=privileged))
 
-    def num_pred_positive(self):
-        return self.num_true_positive() + self.num_false_positive()
-
-    def num_pred_negative(self):
-        return self.num_true_negative() + self.num_false_negative()
-
-    def num_true_positive(self):
+    def num_true_positive(self, privileged=None):
         return np.sum(
-            (self.orig_df[self.label_name][self.make_mask()] ==
-             self.pred_df[self.label_name][self.make_mask()]))
+            (self.orig_df[self.label_name][self.make_mask(privileged=privileged)] ==
+             self.pred_df[self.label_name][self.make_mask(privileged=privileged)]))
 
-    def num_true_negative(self):
+    def num_true_negative(self, privileged=None):
         return np.sum(
-            (self.orig_df[self.label_name][~self.make_mask()] ==
-             self.pred_df[self.label_name][~self.make_mask()]))
+            (self.orig_df[self.label_name][~self.make_mask(privileged=privileged)] ==
+             self.pred_df[self.label_name][~self.make_mask(privileged=privileged)]))
 
-    def num_false_positive(self):
+    def num_false_positive(self, privileged=None):
         return np.sum(
-            (self.orig_df[self.label_name][~self.make_mask()] !=
-             self.pred_df[self.label_name][~self.make_mask()]))
+            (self.orig_df[self.label_name][~self.make_mask(privileged=privileged)] !=
+             self.pred_df[self.label_name][~self.make_mask(privileged=privileged)]))
 
-    def num_false_negative(self):
+    def num_false_negative(self, privileged=None):
         return np.sum(
-            (self.orig_df[self.label_name][self.make_mask()] !=
-             self.pred_df[self.label_name][self.make_mask()]))
+            (self.orig_df[self.label_name][self.make_mask(privileged=privileged)] !=
+             self.pred_df[self.label_name][self.make_mask(privileged=privileged)]))
 
-    def perform_confusion_matrix(self):
-        P = self.num_positive()
-        N = self.num_negative()
-        TP = self.num_true_positive()
-        TN = self.num_true_negative()
-        FP = self.num_false_positive()
-        FN = self.num_false_negative()
+    def num_pred_positive(self, privileged=None):
+        return self.num_true_positive(privileged=privileged) + self.num_false_positive(privileged=privileged)
+
+    def num_pred_negative(self, privileged=None):
+        return self.num_true_negative(privileged=privileged) + self.num_false_negative(privileged=privileged)
+
+    def perform_confusion_matrix(self, privileged=None):
+        P = self.num_positive(privileged=privileged)
+        N = self.num_negative(privileged=privileged)
+        TP = self.num_true_positive(privileged=privileged)
+        TN = self.num_true_negative(privileged=privileged)
+        FP = self.num_false_positive(privileged=privileged)
+        FN = self.num_false_negative(privileged=privileged)
         return dict(TPR=TP/P, TNR=TN/N, FPR=FP/N, FNR=FN/P,
                     PPV=TP/(TP+FP), NPV=TN/(TN+FN), FDR=FP/(TP+FP), FOR=FN/(TN+FN),
                     ACC=(TP+TN)/(P+N) if P+N > 0. else np.float64(0.))
 
-    def accuracy(self):
-        P = self.num_positive()
-        N = self.num_negative()
-        TP = self.num_true_positive()
-        TN = self.num_true_negative()
+    def accuracy(self, privileged=None):
+        P = self.num_positive(privileged=privileged)
+        N = self.num_negative(privileged=privileged)
+        TP = self.num_true_positive(privileged=privileged)
+        TN = self.num_true_negative(privileged=privileged)
         return (TP+TN)/(P+N)
 
-    def true_positive_rate(self):
-        return self.num_positive()/self.num_true_positive()
+    def true_positive_rate(self, privileged=None):
+        return self.num_positive(privileged=privileged)/self.num_true_positive(privileged=privileged)
 
-    def true_negative_rate(self):
-        return self.num_negative()/self.num_true_negative()
+    def true_negative_rate(self, privileged=None):
+        return self.num_negative(privileged=privileged)/self.num_true_negative(privileged=privileged)
 
-    def false_positive_rate(self):
-        return self.num_false_positive()/self.num_negative()
+    def false_positive_rate(self, privileged=None):
+        return self.num_false_positive(privileged=privileged)/self.num_negative(privileged=privileged)
 
-    def false_negative_rate(self):
-        return self.num_false_negative()/self.num_positive()
+    def false_negative_rate(self, privileged=None):
+        return self.num_false_negative(privileged=privileged)/self.num_positive(privileged=privileged)
 
-    def positive_predictive_value(self):
-        return self.num_true_positive()/self.num_pred_positive()
+    def positive_predictive_value(self, privileged=None):
+        return self.num_true_positive(privileged=privileged)/self.num_pred_positive(privileged=privileged)
 
-    def negative_predictive_value(self):
-        return self.num_true_negative()/self.num_pred_negative()
+    def negative_predictive_value(self, privileged=None):
+        return self.num_true_negative(privileged=privileged)/self.num_pred_negative(privileged=privileged)
 
-    def false_discovery_rate(self):
-        return self.num_false_positive()/self.num_pred_positive()
+    def false_discovery_rate(self, privileged=None):
+        return self.num_false_positive(privileged=privileged)/self.num_pred_positive(privileged=privileged)
 
-    def false_omission_rate(self):
-        return self.num_false_negative()/self.num_pred_negative()
+    def false_omission_rate(self, privileged=None):
+        return self.num_false_negative(privileged=privileged)/self.num_pred_negative(privileged=privileged)
 
-    def sensitivity(self):
-        return self.true_positive_rate()
+    def sensitivity(self, privileged=None):
+        return self.true_positive_rate(privileged=privileged)
 
-    def recall(self):
-        return self.true_positive_rate()
+    def recall(self, privileged=None):
+        return self.true_positive_rate(privileged=privileged)
 
-    def specificity(self):
-        return self.true_negative_rate()
+    def specificity(self, privileged=None):
+        return self.true_negative_rate(privileged=privileged)
 
-    def fall_out(self):
-        return self.false_positive_rate()
+    def fall_out(self, privileged=None):
+        return self.false_positive_rate(privileged=privileged)
 
-    def miss_rate(self):
-        return self.false_negative_rate()
+    def miss_rate(self, privileged=None):
+        return self.false_negative_rate(privileged=privileged)

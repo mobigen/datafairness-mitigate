@@ -26,14 +26,14 @@ class ClassificationMetric:
         mask = self.origin_pos_mask
         if privileged is not None:
             if privileged:
-                pass
+                mask = np.logical_and(self.origin_pos_mask, self.orig_df[self.prot_name] == 1)
             else:
-                pass
+                mask = np.logical_and(self.origin_pos_mask, self.orig_df[self.prot_name] == 0)
         return mask
 
     def num_positive(self, privileged=None):
         """Positive 개체수를 카운트하여 반환."""
-        return np.sum(self.make_mask())
+        return np.sum(self.make_mask(privileged=privileged))
 
     def num_negative(self):
         return np.sum(~self.make_mask())

@@ -86,3 +86,6 @@ def preprocess_df(df,
     df = convert_protected_attribute_to_binary(df, protected_attribute_names, privileged_class)
     df = convert_label_to_binary(df, label_name, favorable_label_classes)
     return df
+
+def describe_df(df):
+    print('Shape:', df.shape)

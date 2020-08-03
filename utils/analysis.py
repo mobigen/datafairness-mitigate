@@ -8,14 +8,10 @@ class ClassificationMetric:
         """Data와 Model 예측 결과로부터 예측 성능과 공정성에 관한 Metric을 제공
 
         Arguments:
-        - origin_df (pandas.DataFrame):
-            - 원본 데이터
-        - prediction_df (pandas.DataFrame):
-            - 레이블이 모델 예측값(Binary)로 치환된 모델 데이터
-        - protected_attribute_name (str):
-            - 원본, 모델 pandas.DataFrame 컬럼으로 정의된 Protected Attribute Name
-        - label_name (str):
-            - 원본, 모델 pandas.DataFrame 컬럼으로 정의된 Label Name
+            origin_df (pandas.DataFrame): 원본 데이터
+            prediction_df (pandas.DataFrame): 레이블이 모델 예측값(Binary)로 치환된 모델 데이터
+            protected_attribute_name (str): 원본, 모델 pandas.DataFrame 컬럼으로 정의된 Protected Attribute Name
+            label_name (str): 원본, 모델 pandas.DataFrame 컬럼으로 정의된 Label Name
         """
         self.orig_df = origin_df
         self.pred_df = prediction_df
@@ -29,10 +25,11 @@ class ClassificationMetric:
         """특정 조건에 따라 Metric에 사용할 Mask를 생성
 
         Arguments:
-        - privileged (None/True/False):
-            - None: 전체 Group에 대하여 계산
-            - True: Protected attribute 값이 1인 Group에 대하여 계산
-            - False: Pretected attribute 값이 0인 Group에 대하여 계산"""
+            privileged (bool or None):
+                None: 전체 Group에 대하여 계산
+                True: Protected attribute 값이 1인 Group에 대하여 계산
+                False: Protected attribute 값이 0인 Group에 대하여 계산
+        """
         if self.origin_pos_mask is None:
             self.origin_pos_mask = (self.orig_df[self.label_name] == True)
 
@@ -103,6 +100,13 @@ class ClassificationMetric:
         TP = self.num_true_positive(privileged=privileged)
         TN = self.num_true_negative(privileged=privileged)
         return (TP+TN)/(P+N)
+
+    def balanced_accuracy(self, privileged=None):
+        """Balanced Accuary 계산
+
+        0.5 * Pr(Y_hat=1|Y=1) + Pr(Y_hat=0|Y=0)
+        """
+        return 0.5 * self.true_positive_rate(privileged=privileged)+self.true_negative_rate(privileged=privileged)
 
     def true_positive_rate(self, privileged=None):
         """실제 Positive에서 True Positive가 차지하는 비율"""

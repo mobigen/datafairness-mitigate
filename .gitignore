@@ -1,4 +1,13 @@
+# VSCode
 .vscode/
+
+# Pycharm
+.idea/
+
+# Python
+__pycache__/
+*.pyc
+
+# Others
 data/
 tmp*
-__pycache__/

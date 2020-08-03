@@ -22,7 +22,33 @@ def get_adults_df():
     test = pd.read_csv(test_path, header=0, names=column_names,
         skipinitialspace=True, na_values=na_values)
 
-    return pd.concat([train, test], ignore_index=True)
+    df = pd.concat([train, test], ignore_index=True)
+
+    # specific preprocess
+    def group_edu(x):
+        if x <= 5: return '<6'
+        elif x >= 13: return '>12'
+        else: return x
+
+    def age_cut(x):
+        if x >= 70: return '>=70'
+        else: return x
+
+    def group_race(x):
+        if x == 'White': return 1.
+        else: return 0.
+
+    df['Age (decade)'] = df['age'].apply(lambda x: x//10*10)
+    df['Age (decade)'] = df['Age (decade)'].apply(lambda x: age_cut(x))
+    df['Education Years'] = df['education-num'].apply(lambda x: group_edu(x))
+    df['Education Years'] = df['Education Years'].astype('category')
+    df['race'] = df['race'].apply(lambda x: group_race(x))
+    df['sex'] = df['sex'].replace({'Female': 0., 'Male': 1.})
+
+    # select feature
+    features_to_keep = {'Age (decade)', 'Education Years', 'sex', 'race', 'income-per-year'}
+    df = df[sorted(features_to_keep, key=df.columns.get_loc)]
+    return df
 
 def handle_missing(df, handle_funcs=None):
     "결측치 처리"

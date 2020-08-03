@@ -106,11 +106,11 @@ class ClassificationMetric:
 
     def true_positive_rate(self, privileged=None):
         """실제 Positive에서 True Positive가 차지하는 비율"""
-        return self.num_positive(privileged=privileged)/self.num_true_positive(privileged=privileged)
+        return self.num_true_positive(privileged=privileged)/self.num_positive(privileged=privileged)
 
     def true_negative_rate(self, privileged=None):
         """실제 Negative에서 True Negative가 차지하는 비율"""
-        return self.num_negative(privileged=privileged)/self.num_true_negative(privileged=privileged)
+        return self.num_true_negative(privileged=privileged)/ self.num_negative(privileged=privileged)
 
     def false_positive_rate(self, privileged=None):
         """실제 Negative에서 False Positive가 차지하는 비율"""

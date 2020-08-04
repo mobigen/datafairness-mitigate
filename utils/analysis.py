@@ -19,59 +19,71 @@ class ClassificationMetric:
         self.prot_name = protected_attribute_name
         self.label_name = label_name
 
-        self.origin_pos_mask = None
-
-    def make_mask(self, privileged=None):
+    def make_mask(self, df_type, pos_neg, privileged=None):
         """특정 조건에 따라 Metric에 사용할 Mask를 생성
 
         Arguments:
+            df_type (str):
+                origin 또는 prediction dataset 중 한 종류를 mask 한다
+            pos_neg (str):
+                positive 또는 negative 중 한 종류를 mask 한다
             privileged (bool or None):
-                None: 전체 Group에 대하여 계산
-                True: Protected attribute 값이 1인 Group에 대하여 계산
-                False: Protected attribute 값이 0인 Group에 대하여 계산
+                None: 전체 Group에 대하여 mask 한다
+                True: Protected attribute 값이 1인 Group 만 mask 한다
+                False: Protected attribute 값이 0인 Group 만 mask 한다
         """
-        if self.origin_pos_mask is None:
-            self.origin_pos_mask = (self.orig_df[self.label_name] == True)
+        if df_type == 'origin':
+            df_pos_mask = (self.orig_df[self.label_name] == True)
+        elif df_type == 'prediction':
+            df_pos_mask = (self.pred_df[self.label_name] == True)
+        else:
+            raise ValueError('Argument \'df_type\' must be \'origin\' or \'prediction\'')
 
-        mask = self.origin_pos_mask
+        if pos_neg == 'positive':
+            mask = df_pos_mask
+        elif pos_neg == 'negative':
+            mask = ~df_pos_mask
+        else:
+            raise ValueError('Argument \'pos_neg\' must be \'positive\' or \'negative\'')
+
         if privileged is not None:
             if privileged:
-                mask = np.logical_and(self.origin_pos_mask, self.orig_df[self.prot_name] == 1)
+                mask = np.logical_and(mask, self.orig_df[self.prot_name] == 1)
             else:
-                mask = np.logical_and(self.origin_pos_mask, self.orig_df[self.prot_name] == 0)
+                mask = np.logical_and(mask, self.orig_df[self.prot_name] == 0)
         return mask
 
     def num_positive(self, privileged=None):
         """Positive 개체수를 카운트하여 반환"""
-        return np.sum(self.make_mask(privileged=privileged))
+        return np.sum(self.make_mask(df_type='origin', pos_neg='positive', privileged=privileged))
 
     def num_negative(self, privileged=None):
         """Negative 개체수를 카운트하여 반환"""
-        return np.sum(~self.make_mask(privileged=privileged))
+        return np.sum(self.make_mask(df_type='origin', pos_neg='negative', privileged=privileged))
 
     def num_true_positive(self, privileged=None):
         """Model이 실제 Positive를 Positive라고 제대로 예측한 개체수"""
-        return np.sum(
-            (self.orig_df[self.label_name][self.make_mask(privileged=privileged)] ==
-             self.pred_df[self.label_name][self.make_mask(privileged=privileged)]))
+        mask_orig_pos = self.make_mask(df_type='origin', pos_neg='positive', privileged=privileged)
+        mask_pred_pos = self.make_mask(df_type='prediction', pos_neg='positive', privileged=privileged)
+        return np.sum(np.logical_and(mask_orig_pos, mask_pred_pos))
 
     def num_true_negative(self, privileged=None):
         """Model이 실제 Negative를 Negative라고 제대로 예측한 개체수"""
-        return np.sum(
-            (self.orig_df[self.label_name][~self.make_mask(privileged=privileged)] ==
-             self.pred_df[self.label_name][~self.make_mask(privileged=privileged)]))
+        mask_orig_neg = self.make_mask(df_type='origin', pos_neg='negative', privileged=privileged)
+        mask_pred_neg = self.make_mask(df_type='prediction', pos_neg='negative', privileged=privileged)
+        return np.sum(np.logical_and(mask_orig_neg, mask_pred_neg))
 
     def num_false_positive(self, privileged=None):
         """Model이 실제 Negative를 Positive라고 잘못 예측한 개체수"""
-        return np.sum(
-            (self.orig_df[self.label_name][~self.make_mask(privileged=privileged)] !=
-             self.pred_df[self.label_name][~self.make_mask(privileged=privileged)]))
+        mask_orig_neg = self.make_mask(df_type='origin', pos_neg='negative', privileged=privileged)
+        mask_pred_pos = self.make_mask(df_type='prediction', pos_neg='positive', privileged=privileged)
+        return np.sum(np.logical_and(mask_orig_neg, mask_pred_pos))
 
     def num_false_negative(self, privileged=None):
         """Model이 실제 Positive를 Negative라고 잘못 예측한 개체수"""
-        return np.sum(
-            (self.orig_df[self.label_name][self.make_mask(privileged=privileged)] !=
-             self.pred_df[self.label_name][self.make_mask(privileged=privileged)]))
+        mask_orig_pos = self.make_mask(df_type='origin', pos_neg='positive', privileged=privileged)
+        mask_pred_neg = self.make_mask(df_type='prediction', pos_neg='negative', privileged=privileged)
+        return np.sum(np.logical_and(mask_orig_pos, mask_pred_neg))
 
     def num_pred_positive(self, privileged=None):
         """Model이 예측한 총 Positive 개체수"""
@@ -104,9 +116,10 @@ class ClassificationMetric:
     def balanced_accuracy(self, privileged=None):
         """Balanced Accuary 계산
 
-        0.5 * Pr(Y_hat=1|Y=1) + Pr(Y_hat=0|Y=0)
+        0.5 * {Pr(Y_hat=1|Y=1) + Pr(Y_hat=0|Y=0)}
         """
-        return 0.5 * self.true_positive_rate(privileged=privileged)+self.true_negative_rate(privileged=privileged)
+        return 0.5 * (self.true_positive_rate(privileged=privileged) +
+                      self.true_negative_rate(privileged=privileged))
 
     def true_positive_rate(self, privileged=None):
         """실제 Positive에서 True Positive가 차지하는 비율"""

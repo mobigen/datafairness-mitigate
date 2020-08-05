@@ -4,9 +4,9 @@ import numpy as np
 import pandas as pd
 
 class ClassificationMetric:
+    """Data와 Model 예측 결과로부터 예측 성능과 공정성에 관한 Metric을 제공"""
     def __init__(self, origin_df, prediction_df, protected_attribute_name, label_name):
-        """Data와 Model 예측 결과로부터 예측 성능과 공정성에 관한 Metric을 제공
-
+        """
         Arguments:
             origin_df (pandas.DataFrame): 원본 데이터
             prediction_df (pandas.DataFrame): 레이블이 모델 예측값(Binary)로 치환된 모델 데이터
@@ -106,7 +106,10 @@ class ClassificationMetric:
                     ACC=(TP+TN)/(P+N) if P+N > 0. else np.float64(0.))
 
     def accuracy(self, privileged=None):
-        """Accuracy 계산"""
+        r"""Accuracy 계산
+
+        .. math:: \frac{(TP + TN)}{(P + N)}
+        """
         P = self.num_positive(privileged=privileged)
         N = self.num_negative(privileged=privileged)
         TP = self.num_true_positive(privileged=privileged)
@@ -114,43 +117,67 @@ class ClassificationMetric:
         return (TP+TN)/(P+N)
 
     def balanced_accuracy(self, privileged=None):
-        """Balanced Accuary 계산
+        r"""Balanced Accuary 계산
 
-        0.5 * {Pr(Y_hat=1|Y=1) + Pr(Y_hat=0|Y=0)}
+        .. math:: 0.5 \times Pr(\hat{Y}|Y=1) + Pr(\hat{Y}=0|Y=0)
         """
         return 0.5 * (self.true_positive_rate(privileged=privileged) +
                       self.true_negative_rate(privileged=privileged))
 
     def true_positive_rate(self, privileged=None):
-        """실제 Positive에서 True Positive가 차지하는 비율"""
+        r"""실제 Positive에서 True Positive가 차지하는 비율
+
+        .. math:: \frac{Pr(\hat{Y}=1|Y=1)}{Pr(Y=1)}
+        """
         return self.num_true_positive(privileged=privileged)/self.num_positive(privileged=privileged)
 
     def true_negative_rate(self, privileged=None):
-        """실제 Negative에서 True Negative가 차지하는 비율"""
+        r"""실제 Negative에서 True Negative가 차지하는 비율
+
+        .. math:: \frac{Pr(\hat{Y}=0|Y=0)}{Pr(Y=0)}
+        """
         return self.num_true_negative(privileged=privileged)/ self.num_negative(privileged=privileged)
 
     def false_positive_rate(self, privileged=None):
-        """실제 Negative에서 False Positive가 차지하는 비율"""
+        r"""실제 Negative에서 False Positive가 차지하는 비율
+
+        .. math:: \frac{Pr(\hat{Y}=1|Y=0)}{Pr(Y=0)}
+        """
         return self.num_false_positive(privileged=privileged)/self.num_negative(privileged=privileged)
 
     def false_negative_rate(self, privileged=None):
-        """실제 Positive에서 False Negative가 차지하는 비율"""
+        r"""실제 Positive에서 False Negative가 차지하는 비율
+
+        .. math:: \frac{Pr(\hat{Y}=0|Y=1)}{Pr(Y=1)}
+        """
         return self.num_false_negative(privileged=privileged)/self.num_positive(privileged=privileged)
 
     def positive_predictive_value(self, privileged=None):
-        """Model이 예측한 Positive에서 실제 Positive가 차지하는 비율"""
+        r"""Model이 예측한 Positive에서 실제 Positive가 차지하는 비율
+
+        .. math:: \frac{Pr(\hat{Y}=1|Y=1)}{Pr(\hat{Y}=1)}
+        """
         return self.num_true_positive(privileged=privileged)/self.num_pred_positive(privileged=privileged)
 
     def negative_predictive_value(self, privileged=None):
-        """Model이 예측한 Negative에서 실제 Negative가 차지하는 비율"""
+        r"""Model이 예측한 Negative에서 실제 Negative가 차지하는 비율
+
+        .. math:: \frac{Pr(\hat{Y}=0|Y=0)}{Pr(\hat{Y}=0)}
+        """
         return self.num_true_negative(privileged=privileged)/self.num_pred_negative(privileged=privileged)
 
     def false_discovery_rate(self, privileged=None):
-        """Model이 예측한 Positive에서 Positive로 잘못 예측한(실제 Negative인) 개체들이 차지하는 비율"""
+        r"""Model이 예측한 Positive에서 Positive로 잘못 예측한(실제 Negative인) 개체들이 차지하는 비율
+
+        .. math:: \frac{Pr(\hat{Y}=1|Y=0)}{Pr(\hat{Y}=1)}
+        """
         return self.num_false_positive(privileged=privileged)/self.num_pred_positive(privileged=privileged)
 
     def false_omission_rate(self, privileged=None):
-        """Model이 예측한 Negative에서 Negative로 잘못 예측한(실제 Positive인) 개체들이 차지하는 비율"""
+        r"""Model이 예측한 Negative에서 Negative로 잘못 예측한(실제 Positive인) 개체들이 차지하는 비율
+
+        .. math:: \frac{Pr(\hat{Y}=0|Y=1)}{Pr(\hat{Y}=0)}
+        """
         return self.num_false_negative(privileged=privileged)/self.num_pred_negative(privileged=privileged)
 
     def sensitivity(self, privileged=None):
@@ -184,34 +211,45 @@ class ClassificationMetric:
             raise ValueError('Invalid Argument \'privileged\': {}'.format(privileged))
 
     def base_rate(self, privileged=None):
-        """전체에서 Positive 개체가 차지하는 비율
+        r"""전체에서 Positive 개체가 차지하는 비율
 
-        Pr(Y=1)
+        .. math:: Pr(Y=1)
         """
         return self.num_positive(privileged=privileged)/(self.num_positive(privileged=privileged)+
                                                          self.num_negative(privileged=privileged))
 
     def selection_rate(self, privileged=None):
-        """전체에서 Model이 예측한 Positive 개체가 차지하는 비율
+        r"""전체에서 Model이 예측한 Positive 개체가 차지하는 비율
 
-        Pr(Y_hat=1)"""
+        .. math:: Pr(\hat{Y}=1|D=d), \text{ d is one of } unprivileged, privileged \text{ or } all.
+        """
         return self.num_pred_positive(privileged=privileged)/(self.num_positive(privileged=privileged)+
                                                               self.num_negative(privileged=privileged))
 
     def fairness_ratio(self, fn):
-        """Unprivileged Group 과 Privileged Group 간 어떤 함수 fn을 적용했을때 그 결과의 비율"""
+        r"""Unprivileged Group 과 Privileged Group 간 어떤 함수 f를 적용했을때 그 결과의 비율
+
+        .. math:: \frac{f(D=unprivileged)}{f(D=privileged)}
+        """
         return fn(privileged=False) / fn(privileged=True)
 
     def fairness_difference(self, fn):
-        """Unprivileged Group 과 Privileged Group 간 어떤 함수 fn을 적용했을때 그 결과의 차"""
+        r"""Unprivileged Group 과 Privileged Group 간 어떤 함수 f를 적용했을때 그 결과의 차
+
+        .. math:: f(D=unprivileged) - f(D=privileged)
+        """
         return fn(privileged=False) - fn(privileged=True)
 
     def disparate_impact(self):
-        """Pr(Y_hat=1|D=Unprivileged)/Pr(Y_hat=1|D=privileged)"""
+        r"""
+        .. math:: \frac{Pr(\hat{Y}=1|D=unprivileged)}{Pr(\hat{Y}=1|D=privileged)}
+        """
         return self.fairness_ratio(self.selection_rate)
 
     def statistical_parity_difference(self):
-        """Pr(Y_hat=1|D=Unprivileged)-Pr(Y_hat=1|D=privileged)"""
+        r"""
+        .. math:: Pr(\hat{Y}=1|D=Unprivileged) - Pr(\hat{Y}=1|D=privileged)
+        """
         return self.fairness_difference(self.selection_rate)
 
     def mean_difference(self):
@@ -219,13 +257,17 @@ class ClassificationMetric:
         return self.statistical_parity_difference()
 
     def average_odds_difference(self):
+        r"""
+        .. math::
+            0.5 \times \left\{\Big((Pr(\hat{Y}=1|Y=0, D=unprivileged) - Pr(\hat{Y}=1|Y=0, D=privileged)\Big) +
+
+            \Big(Pr(\hat{Y}=1|Y=1, D=unprivileged) - Pr(\hat{Y}=1|Y=1, D=privileged)\Big)\right\}
         """
-        0.5 * {(FPR_D=unprivileged-FPR_D=privileged) + (TPR_D=unprivileged-TPR_D=privileged)}
-        = 0.5 * [{Pr(Y_hat=1|Y=0, D=unprivileged) - Pr(Y_hat=1|Y=0, D=privileged)} +
-        {Pr(Y_hat=1|Y=1, D=unprivileged) - Pr(Y_hat=1|Y=1, D=privileged)}]"""
         return 0.5 * (self.fairness_difference(self.false_positive_rate) +
                       self.fairness_difference(self.true_positive_rate))
 
     def equal_opportunity_difference(self):
-        """Pr(Y_hat=1|Y=1, D=unprivileged) - Pr(Y_hat=1|Y=1, D=privileged)"""
+        r"""
+        .. math:: Pr(\hat{Y}=1|Y=1, D=unprivileged) - Pr(\hat{Y}=1|Y=1, D=privileged)
+        """
         return self.fairness_difference(self.true_positive_rate)

@@ -51,7 +51,7 @@ def get_adults_df():
     return df
 
 def handle_missing(df, handle_funcs=None):
-    "결측치 처리"
+    """결측치 처리"""
     if handle_funcs: raise NotImplementedError
     else:
         dropped_df = df.dropna()
@@ -61,7 +61,7 @@ def handle_missing(df, handle_funcs=None):
     return df
 
 def convert_one_hot_features(df, column_names=None):
-    "Categorical Column을 One-Hot으로 변환"
+    """Categorical Column을 One-Hot으로 변환"""
     if column_names:
         df = pd.get_dummies(df, prefix_sep='=', columns=column_names)
     return df

@@ -9,46 +9,47 @@ except ImportError as e:
     print("Import Error: %s"%e)
 
 class AdversarialDebiasing:
-    def __init__(self, *args, **kwargs):
+    """적대적 학습을 통해 편향 완화 능력을 갖춘 Classifier"""
+    def __init__(self, unprivileged_groups, privileged_groups, scope_name, sess,
+                 seed=None, adversary_loss_weight=0.1, num_epochs=50, batch_size=128,
+                 classifier_num_hidden_units=200, debias=True):
         """
         Args:
-        - 0: unprivileged_groups (list of dict):
-            - Representation for unprivileged groups.
-            - 형식 [{'attr_name': value}, ...] 으로 인자를 받으나 모델 구현때는 리스트의
-            index 0에 해당하는 요소를 제외하고 사용하지 않음
-        - 1: privileged_groups (list of dict):
-            - Representation for privileged groups
-            - 형식 [{'attr_name': value}, ...] 으로 인자를 받으나 모델 구현때는 리스트의
-            index 0에 해당하는 요소를 제외하고 사용하지 않음
-        - 2: scope_name (str): scope name for the tenforflow variables
-        - 3: sess (tf.Session): tensorflow session
-
-        Kwargs:
-        - seed (int, optional): Seed to make `predict` repeatable.
-        - adversary_loss_weight (float, optional): Hyperparameter that chooses
-            the strength of the adversarial loss.
-        - num_epochs (int, optional): Number of training epochs.
-        - batch_size (int, optional): Batch size.
-        - classifier_num_hidden_units (int, optional): Number of hidden units
-            in the classifier model.
-        - debias (bool, optional): Learn a classifier with or without
-            debiasing.
+            unprivileged_groups (list of dict):
+                Representation for unprivileged groups.
+                형식 [{'attr_name': value}, ...] 으로 인자를 받으나 모델 구현때는 리스트의
+                index 0에 해당하는 요소를 제외하고 사용하지 않음
+            privileged_groups (list of dict):
+                Representation for privileged groups.
+                형식 [{'attr_name': value}, ...] 으로 인자를 받으나 모델 구현때는 리스트의
+                index 0에 해당하는 요소를 제외하고 사용하지 않음
+            scope_name (str): scope name for the tenforflow variables
+            sess (tensorflow.Session): tensorflow session
+            seed (int, optional): Seed to make `predict` repeatable.
+            adversary_loss_weight (float, optional):
+                Hyperparameter that chooses the strength of the adversarial loss.
+            num_epochs (int, optional): Number of training epochs.
+            batch_size (int, optional): Batch size.
+            classifier_num_hidden_units (int, optional):
+                Number of hidden units in the classifier model.
+            debias (bool, optional):
+                Learn a classifier with or without debiasing.
         """
-        self.unprivileged_groups = args[0]
-        self.privileged_groups = args[1]
+        self.unprivileged_groups = unprivileged_groups
+        self.privileged_groups = privileged_groups
 
         if len(self.unprivileged_groups) > 1 or len(self.privileged_groups) > 1:
             raise ValueError("Only one unprivileged_group or privileged_group supported.")
         self.protected_attribute_name = list(self.unprivileged_groups[0].keys())[0]
-        self.scope_name = args[2]
-        self.sess = args[3]
+        self.scope_name = scope_name
+        self.sess = sess
 
-        self.seed = kwargs.get('seed', None)
-        self.adversary_loss_weight = kwargs.get('adversary_loss_weight', 0.1)
-        self.num_epochs = kwargs.get('num_epochs', 50)
-        self.batch_size = kwargs.get('batch_size', 128)
-        self.classifier_num_hidden_units = kwargs.get('classifier_num_hidden_units', 200)
-        self.debias = kwargs.get('debias', True)
+        self.seed = seed
+        self.adversary_loss_weight = adversary_loss_weight
+        self.num_epochs = num_epochs
+        self.batch_size = batch_size
+        self.classifier_num_hidden_units = classifier_num_hidden_units
+        self.debias = debias
 
         self.features_dim = None
         self.features_ph = None
@@ -96,15 +97,14 @@ class AdversarialDebiasing:
         """Compute the model parameters of the fair classifier using gradient descent.
 
         Args:
-        - df: pd.DataFrame containing true labels.
-        - label_name: label name
-        - protected_attribute_names:
-            - protected attribute names
-            - 실제 학습에 사용되는 protected attribute는 protected attribute names이 여러개라도
-            첫번째 name만 사용함
+            df (pd.DataFrame): containing true labels.
+            protected_attribute_names (list of str):
+                실제 학습에 사용되는 protected attribute 는 protected attribute names 이 여러개라도
+                첫번째 name 만 사용함
+            label_name (str): label name
 
         Returns:
-        - AdversarialDebiasing: Returns self.
+            AdversarialDebiasing: Returns self.
         """
         if not isinstance(df, pd.DataFrame):
             raise TypeError('Argument Type of \'df\' must be pandas.DataFrame, not %s'%str(type(df)))
@@ -206,10 +206,11 @@ class AdversarialDebiasing:
         classifier learned.
 
         Args:
-            dataset (BinaryLabelDataset): Dataset containing labels that needs
+            df (pandas.DataFrame): Dataset containing labels that needs
                 to be transformed.
+            label_name (str): Label of Dataset
         Returns:
-            dataset (BinaryLabelDataset): Transformed dataset.
+            pandas.DataFrame: Transformed dataset.
         """
         if not isinstance(df, pd.DataFrame):
             raise TypeError('Argument Type of \'df\' must be pandas.DataFrame, not %s'%str(type(df)))

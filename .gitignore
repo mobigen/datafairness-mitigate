@@ -11,3 +11,4 @@ __pycache__/
 # Others
 data/
 tmp*
+rsync_bswgpu02.sh

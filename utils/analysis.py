@@ -172,3 +172,60 @@ class ClassificationMetric:
     def miss_rate(self, privileged=None):
         """False Negative Rate의 Alias"""
         return self.false_negative_rate(privileged=privileged)
+
+    def num_instances(self, privileged=None):
+        if privileged is None:
+            return self.orig_df.shape[0]
+        elif privileged:
+            return self.orig_df[self.orig_df[self.prot_name] == 1].shape[0]
+        elif not privileged:
+            return self.orig_df[self.orig_df[self.prot_name] == 0].shape[0]
+        else:
+            raise ValueError('Invalid Argument \'privileged\': {}'.format(privileged))
+
+    def base_rate(self, privileged=None):
+        """전체에서 Positive 개체가 차지하는 비율
+
+        Pr(Y=1)
+        """
+        return self.num_positive(privileged=privileged)/(self.num_positive(privileged=privileged)+
+                                                         self.num_negative(privileged=privileged))
+
+    def selection_rate(self, privileged=None):
+        """전체에서 Model이 예측한 Positive 개체가 차지하는 비율
+
+        Pr(Y_hat=1)"""
+        return self.num_pred_positive(privileged=privileged)/(self.num_positive(privileged=privileged)+
+                                                              self.num_negative(privileged=privileged))
+
+    def fairness_ratio(self, fn):
+        """Unprivileged Group 과 Privileged Group 간 어떤 함수 fn을 적용했을때 그 결과의 비율"""
+        return fn(privileged=False) / fn(privileged=True)
+
+    def fairness_difference(self, fn):
+        """Unprivileged Group 과 Privileged Group 간 어떤 함수 fn을 적용했을때 그 결과의 차"""
+        return fn(privileged=False) - fn(privileged=True)
+
+    def disparate_impact(self):
+        """Pr(Y_hat=1|D=Unprivileged)/Pr(Y_hat=1|D=privileged)"""
+        return self.fairness_ratio(self.selection_rate)
+
+    def statistical_parity_difference(self):
+        """Pr(Y_hat=1|D=Unprivileged)-Pr(Y_hat=1|D=privileged)"""
+        return self.fairness_difference(self.selection_rate)
+
+    def mean_difference(self):
+        """statistical_parity_difference의 Alias"""
+        return self.statistical_parity_difference()
+
+    def average_odds_difference(self):
+        """
+        0.5 * {(FPR_D=unprivileged-FPR_D=privileged) + (TPR_D=unprivileged-TPR_D=privileged)}
+        = 0.5 * [{Pr(Y_hat=1|Y=0, D=unprivileged) - Pr(Y_hat=1|Y=0, D=privileged)} +
+        {Pr(Y_hat=1|Y=1, D=unprivileged) - Pr(Y_hat=1|Y=1, D=privileged)}]"""
+        return 0.5 * (self.fairness_difference(self.false_positive_rate) +
+                      self.fairness_difference(self.true_positive_rate))
+
+    def equal_opportunity_difference(self):
+        """Pr(Y_hat=1|Y=1, D=unprivileged) - Pr(Y_hat=1|Y=1, D=privileged)"""
+        return self.fairness_difference(self.true_positive_rate)

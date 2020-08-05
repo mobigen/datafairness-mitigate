@@ -113,8 +113,14 @@ def preprocess_df(df,
     df = convert_label_to_binary(df, label_name, favorable_label_classes)
     return df
 
-def describe_df(df):
+def describe_df(df, detail=False):
     print('Shape:', df.shape)
+    if detail:
+        pd.set_option('display.max_rows', len(df))
+        pd.set_option('display.max_columns', None)
+        print(df.describe())
+        pd.reset_option('display.max_rows')
+        pd.reset_option('display.max_columns')
 
 def split_df(df, shuffle=True, ratio=0.7):
     nrow = df.index.values.shape[0]

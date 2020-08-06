@@ -197,3 +197,34 @@ class ClassificationMetric(DatasetMetric):
         .. math:: Pr(\hat{Y}=1|Y=1, D=unprivileged) - Pr(\hat{Y}=1|Y=1, D=privileged)
         """
         return self.fairness_difference(self.true_positive_rate)
+
+    def theil_index(self):
+        r"""
+        Generalized Entropy Index를 이용한 Theil Index 계산 [1]_.
+
+        :math:`b_i = \hat{y}_i - y_i + 1` 일 때,
+
+        .. math::
+
+            \displaystyle\frac{1}{N} \sum_{i=1}^{N} \frac{b_i}{\mu} ln\Big(\frac{b_{i}}{\mu}\Big) =
+            \displaystyle\frac{1}{N} \sum_{i=1}^{N} \frac{1}{\mu} ln\Bigg(\Big(\frac{b_{i}}{\mu}\Big)^{b_{i}}\Bigg)
+
+        References:
+            .. [1] T. Speicher, H. Heidari, N. Grgic-Hlaca, K. P. Gummadi, A. Singla, A. Weller, and M. B. Zafar,
+               "A Unified Approach to Quantifying Algorithmic Unfairness: Measuring Individual and Group Unfairness via Inequality Indices,"
+               ACM SIGKDD International Conference on Knowledge Discovery and Data Mining, 2018.
+
+               https://arxiv.org/pdf/1807.00787
+        """
+        label_orig = self.orig_df[self.label_name].astype(np.float64)
+        label_pred = self.pred_df[self.label_name].astype(np.float64)
+        b = label_pred - label_orig + 1  # benefit score b
+        mu_b = np.mean(b)
+
+        alpha = 1
+        if alpha == 1:
+            # b_i=0 인 경우를 처리하기 위해, 로그의 성질에 의하여 b를 로그 내부 진수의 지수 자리로 이동
+            # np.mean(np.log(b/mu_b)*(b/mu_b)) 이면, b_i=0일때 계산할 수 없음
+            return np.mean(np.log((b/mu_b)**b)/mu_b)
+        else:
+            raise NotImplemented('It\'s not needed that alpha not 1.')

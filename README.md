@@ -2,7 +2,7 @@
 
 이 Repository는 데이터 품질 평가기반 데이터 고도화 및 데이터셋 보정 기술 개발 국책과제의 구성 중 하나이며 데이터의 편향을 보정하는 기술을 개발하는 것을 목적으로 한다.
 
-## 필요성 및 목적
+## 1. 필요성 및 목적
 
 인공지능 및 빅데이터 기술이 적용되는 분야에서 그동안의 주요한 개발 대상과 목표는 더 높은 정확성을 가진 기술을 개발하는 것이었다. 반면에 그런 연구 방향으로는 해당 기술이 내놓은 판단 결과가 얼마나 신뢰할만 하고 공정한 결과인지는 설명하거나 알기 어렵다.
 
@@ -14,9 +14,9 @@
 
 이미 [IBM AIF360](https://aif360.mybluemix.net), [Microsoft Fairlearn](https://fairlearn.github.io), [Google PAIR](https://research.google/teams/brain/pair), Facebook 등 전세계적으로 데이터 공정성 확보를 위한 여러 관련 연구가 진행되고 있으며 다양한 오픈소스들이 나와있다. 따라서 앞선 연구들을 참조하여 데이터로부터 불필요하다고 판단되는 불공정 편향을 탐지하고 탐지한 편향을 완화 또는 제거하는 알고리즘을 개발하는 것을 목표로 한다.
 
-## 방법 및 이론
+## 2. 방법 및 이론
 
-### Adversarial Debiasing
+### 2-1. Adversarial Debiasing
 
 Classification Model의 Classification과 Classification 결과의 공정성 확보를 동시에 수행하는 Deep Learning Classification Model이자 Bias Mitigation Model.
 
@@ -40,13 +40,51 @@ _Classifier_ 는 학습을 통해 Protected Attribute를 포함하는 Feature들
 
 또 자신의 Loss를 감소 시켜야 하므로, 최종적으로 _Classifier_ 는 최대한 높은 Prediction 정확도를 가지면서 Protected Attribute의 영향로부터 공정성을 가지는 결과를 출력하는 모델이 된다.
 
-### Fair Representation
+### 2-2. Fair Representation
 
-## 실험
+## 3. 실험
 
-### 데이터
+### 3-1. 데이터
 
-### Adversarial Debiasing
+#### Adult Dataset
+
+미국 1994 인구조사 자료에 기반하여 특정 개인의 연 수입이 $50K를 초과하는지 예측하는 문제.
+
+14개 Features, 48842 Rows, 결측치 포함
+
+![adult_census](https://user-images.githubusercontent.com/22609242/89599144-a77ffc00-d899-11ea-95d3-2e6a01ab0231.PNG)
+
+* 아래 path에 각 파일을 [다운로드](http://archive.ics.uci.edu/ml/datasets/Adult)
+
+```
+/data/raw/adult/adult.data
+/data/raw/adult/adult.names
+/data/raw/adult/adult.test
+```
+
+Reference:
+
+* http://archive.ics.uci.edu/ml/datasets/Adult
+
+* https://aif360.mybluemix.net/community
+
+### 3-2. Adversarial Debiasing
+
+_Adult Dataset_ 을 이용하여 데이터 편향을 측정하고 Adversarial Debiasing 알고리즘을 적용하여 편향을 완화하는 과정을 보여주는 Tutorial.
+
+`example_adversarial_debiasing.py` 파일을 실행해서 그 결과를 확인해 볼 수 있음.
+
+#### Requirements
+
+* Data
+
+    `/data/raw/adult/adult.data`, `/data/raw/adult/adult.test`
+
+* Python 3
+
+* Tensorflow version 1.*
+
+* Numpy, Pandas
 
 ---
 

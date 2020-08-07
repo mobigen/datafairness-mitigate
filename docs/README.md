@@ -8,9 +8,7 @@ sphinx를 이용하여 제작한 코드 설명 문서. 함수의 인자, 인자 
 
 * Sphinx
 
-    `pip install sphinx`
-
-    `pip install sphinxcontrib-napoleon`
+    `pip install sphinx sphinxcontrib-napoleon`
 
 ## Build
 

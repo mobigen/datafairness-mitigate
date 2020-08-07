@@ -58,7 +58,7 @@ _Classifier_ 는 학습을 통해 Protected Attribute를 포함하는 Feature들
 
 ![adult_census](https://user-images.githubusercontent.com/22609242/89599144-a77ffc00-d899-11ea-95d3-2e6a01ab0231.PNG)
 
-* 아래 path에 각 파일을 [다운로드](http://archive.ics.uci.edu/ml/datasets/Adult)
+* 각 파일을 [다운로드](http://archive.ics.uci.edu/ml/datasets/Adult) 하여 아래 path에 저장
 
 ```
 /data/raw/adult/adult.data

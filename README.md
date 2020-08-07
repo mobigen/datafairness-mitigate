@@ -40,6 +40,10 @@ _Classifier_ 는 학습을 통해 Protected Attribute를 포함하는 Feature들
 
 또 자신의 Loss를 감소 시켜야 하므로, 최종적으로 _Classifier_ 는 최대한 높은 Prediction 정확도를 가지면서 Protected Attribute의 영향로부터 공정성을 가지는 결과를 출력하는 모델이 된다.
 
+#### Training Model Loss Flow
+
+![adversarial_debiasing_model_loss_flow](https://user-images.githubusercontent.com/22609242/89602015-cfbf2900-d8a0-11ea-99d0-84c99fd099c8.png)
+
 ### 2-2. Fair Representation
 
 ## 3. 실험

@@ -44,8 +44,6 @@ _Classifier_ 는 학습을 통해 Protected Attribute를 포함하는 Feature들
 
 ![adversarial_debiasing_model_loss_flow](https://user-images.githubusercontent.com/22609242/89602015-cfbf2900-d8a0-11ea-99d0-84c99fd099c8.png)
 
-### 2-2. Fair Representation
-
 ## 3. 실험
 
 ### 3-1. 데이터

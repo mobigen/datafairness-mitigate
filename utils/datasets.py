@@ -5,11 +5,17 @@ import os
 import numpy as np
 import pandas as pd
 
+from utils import download_data
+
 root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
 def get_adults_df():
     train_path = os.path.join(root_dir, 'data', 'raw', 'adult', 'adult.data')
     test_path = os.path.join(root_dir, 'data', 'raw', 'adult', 'adult.test')
+
+    if not os.path.isfile(train_path) or not os.path.isfile(test_path):
+        print('데이터 파일이 없습니다. 다운로드 합니다.')
+        download_data.download('adult')
 
     na_values = '?'
     column_names = ['age', 'workclass', 'fnlwgt', 'education',

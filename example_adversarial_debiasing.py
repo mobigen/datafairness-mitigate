@@ -3,7 +3,7 @@
 # Import Packages
 import tensorflow as tf
 
-from utils import datasets
+from utils import datasets, preproc
 from metric import DatasetMetric, ClassificationMetric
 from algorithm.adversarial_debiasing import AdversarialDebiasing
 
@@ -21,22 +21,22 @@ def main():
 
     #   Load Test Dataset & Preprocess
     df_orig = datasets.get_adults_df()
-    df_orig = datasets.preprocess_df(df_orig,
+    df_orig = preproc.preprocess_df(df_orig,
                                      protected_attribute_names, privileged_classes,
                                      label_name, ['>50K', '>50K.'],
                                      one_hot_column_names=one_hot_features)
 
     print('#### Basic Statistics of DataFrame')
-    datasets.describe_df(df_orig, detail=True)
+    preproc.describe_df(df_orig, detail=True)
 
     # 1-2.Train Test Splitting
     #   Split Dataset to train:test=7:3
-    df_orig_train, df_orig_test = datasets.split_df(df_orig)
+    df_orig_train, df_orig_test = preproc.split_df(df_orig)
 
     print('#### Trainset')
-    datasets.describe_df(df_orig_train)
+    preproc.describe_df(df_orig_train)
     print('#### Testset')
-    datasets.describe_df(df_orig_test)
+    preproc.describe_df(df_orig_test)
 
     # 1-3. Fairness Metric of Origin Data
     #   데이터셋 자체에 대한 Metric

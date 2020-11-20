@@ -55,3 +55,13 @@ def get_adults_df():
     features_to_keep = {'Age (decade)', 'Education Years', 'sex', 'race', 'income-per-year'}
     df = df[sorted(features_to_keep, key=df.columns.get_loc)]
     return df
+
+def get_bank_df():
+    data_path = os.path.join(root_dir, 'data', 'raw', 'bank', 'bank-additional-full.csv')
+
+    if not os.path.isfile(data_path):
+        print('데이터 파일이 없습니다. 다운로드 합니다.')
+        download_data.download('bank')
+
+    df = pd.read_csv(data_path, sep=';', na_values='unknown')
+    return df

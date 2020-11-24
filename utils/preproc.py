@@ -2,6 +2,7 @@
 
 import numpy as np
 import pandas as pd
+from sklearn import preprocessing
 
 def handle_missing(df, handle_funcs=None):
     """결측치 처리"""
@@ -55,15 +56,23 @@ def convert_label_to_binary(df, label_name, favorable_label_classes):
         df.loc[~pos, label_name] = unfavorable_converted_label
     return df
 
+def min_max_scale(df, target_columns: list=None):
+    if target_columns:
+        min_max_scaler = preprocessing.MinMaxScaler()
+        df[target_columns] = min_max_scaler.fit_transform(df[target_columns])
+    return df
+
 def preprocess_df(df,
                   protected_attribute_names, privileged_class,
                   label_name, favorable_label_classes,
-                  custom_preproc=None, one_hot_column_names=None):
+                  custom_preproc=None, one_hot_column_names=None,
+                  min_max_column_names=None):
     if custom_preproc: df = custom_preproc(df)
     df = handle_missing(df)
     df = convert_one_hot_features(df, column_names=one_hot_column_names)
     df = convert_protected_attribute_to_binary(df, protected_attribute_names, privileged_class)
     df = convert_label_to_binary(df, label_name, favorable_label_classes)
+    df = min_max_scale(df, min_max_column_names)
     return df
 
 def describe_df(df, detail=False):

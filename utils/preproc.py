@@ -6,7 +6,13 @@ from sklearn import preprocessing
 
 def handle_missing(df, handle_funcs=None):
     """결측치 처리"""
-    if handle_funcs: raise NotImplementedError
+    if isinstance(handle_funcs, dict):
+        # 특정 feature들만 처리 (Map 함수는 특정 Column 내 값 단위로 인자를 받음)
+        for feature_name, func in handle_funcs.items():
+            df[feature_name] = df[feature_name].apply(func)
+    elif callable(handle_funcs):
+        # 모든 feature 일괄 처리 (Map 함수는 Column 단위로 인자를 받음)
+        df = df.apply(handle_funcs)
     else:
         dropped_df = df.dropna()
         drop_cnt = df.shape[0] - dropped_df.shape[0]
@@ -65,10 +71,12 @@ def min_max_scale(df, target_columns: list=None):
 def preprocess_df(df,
                   protected_attribute_names, privileged_class,
                   label_name, favorable_label_classes,
-                  custom_preproc=None, one_hot_column_names=None,
+                  custom_preproc=None,
+                  handle_missing_funcs=None,
+                  one_hot_column_names=None,
                   min_max_column_names=None):
     if custom_preproc: df = custom_preproc(df)
-    df = handle_missing(df)
+    df = handle_missing(df, handle_funcs=handle_missing_funcs)
     df = convert_one_hot_features(df, column_names=one_hot_column_names)
     df = convert_protected_attribute_to_binary(df, protected_attribute_names, privileged_class)
     df = convert_label_to_binary(df, label_name, favorable_label_classes)

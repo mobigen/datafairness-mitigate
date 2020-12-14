@@ -84,10 +84,14 @@ def preprocess_df(df,
     return df
 
 def describe_df(df, detail=False):
+    """
+    pandas.Dataframe 의 info(), describe() Method를 실행
+    """
     print('Shape:', df.shape)
     if detail:
         pd.set_option('display.max_rows', len(df))
         pd.set_option('display.max_columns', None)
+        print(df.info())
         print(df.describe())
         pd.reset_option('display.max_rows')
         pd.reset_option('display.max_columns')

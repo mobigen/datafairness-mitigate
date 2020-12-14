@@ -1,6 +1,6 @@
 # Documentation
 
-sphinx를 이용하여 제작한 코드 설명 문서. 함수의 인자, 인자 타입, 설명 등 Google Style Python Docstring을 Rendering하여 출력해 줌.
+sphinx를 이용하여 제작한 코드 설명 문서. 함수의 인자, 인자 타입, 설명 등 Google Style Python Docstring을 Rendering하여 출력해 줌. 
 
 또한 Docstring에는 필요한 경우 LATEX를 사용한 수식이 삽입 되어 있어, text로 표현하기 어려운 수식을 시각적으로 확인해 볼수 있음.
 

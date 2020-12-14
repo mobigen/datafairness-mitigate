@@ -1,6 +1,6 @@
 # datafairness-mitigate
 
-이 Repository는 데이터 품질 평가기반 데이터 고도화 및 데이터셋 보정 기술 개발 국책과제의 구성 중 하나이며 데이터의 편향을 보정하는 기술을 개발하는 것을 목적으로 한다.
+이 Repository는 데이터 품질 평가기반 데이터 고도화 및 데이터셋 보정 기술 개발 국책과제의 구성 중 하나이며 데이터의 편향을 보정하는 기술을 개발하는 것을 목적으로 한다. 
 
 ## 1. 필요성 및 목적
 
@@ -94,7 +94,7 @@ _Adult Dataset_ 을 이용하여 데이터 편향을 측정하고 Adversarial De
 
 (No.2020-0-00512, 데이터 품질 평가기반 데이터 고도화 및 데이터셋 보정 기술 개발)
 
-This work was supported by Institute of Information & communications Technology Planning & Evaluation(IITP) grant funded by the Korea government(MSIT)
+This work was supported by Institute of Information & communications Technology Planning & Evaluation(IITP) grant funded by the Korea government (MSIT)
 
 (No.2020-0-00512, Data Refinment and Improvement through Data Quality Evaluation)
 

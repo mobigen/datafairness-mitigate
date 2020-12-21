@@ -58,7 +58,8 @@ class AdversarialDebiasing:
         self.pred_labels = None
 
     def _classifier_model(self, features, features_dim, keep_prob):
-        """Compute the classifier predictions for the outcome variable.
+        """
+        Compute the classifier predictions for the outcome variable.
         """
         with tf.variable_scope("classifier_model"):
             W1 = tf.get_variable('W1', [features_dim, self.classifier_num_hidden_units],

@@ -79,7 +79,8 @@ class AdversarialDebiasing:
         return pred_label, pred_logit
 
     def _adversary_model(self, pred_logits, true_labels):
-        """Compute the adversary predictions for the protected attribute.
+        """
+        Compute the adversary predictions for the protected attribute.
         """
         with tf.variable_scope("adversary_model"):
             c = tf.get_variable('c', initializer=tf.constant(1.0))
